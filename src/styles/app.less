@@ -59,6 +59,12 @@ body {
   }
 }
 
+// Černobílý podklad. Filtr sedí jen na dlaždicích, takže barevné piny,
+// bubliny a ovládání zůstávají barevné.
+.leaflet-container img.leaflet-tile {
+  filter: grayscale(1) contrast(1.06) brightness(1.02);
+}
+
 .pin-wrapper {
   background: none;
   border: 0;
@@ -141,12 +147,18 @@ body {
     margin-bottom: 10px;
   }
 
-  &__actions {
-    display: flex;
-    gap: 8px;
+  &__navigate {
+    display: block;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: @accent;
+    color: #fff !important;
+    font-weight: 600;
+    text-decoration: none !important;
 
-    button {
-      flex: 1;
+    &:hover {
+      background: darken(@accent, 6%);
     }
   }
 }
@@ -371,18 +383,36 @@ body {
 .row {
   display: flex;
   align-items: center;
-  gap: 8px;
   width: 100%;
-  text-align: left;
-  padding: 7px 8px;
   border-radius: 8px;
-  border: 0;
-  background: none;
-  color: @text;
-  cursor: pointer;
 
   &:hover {
     background: @panel-2;
+  }
+
+  // Akce jsou vidět vždy, jen ztlumené – na dotyku není kam najet myší.
+  .icon-btn {
+    opacity: 0.55;
+  }
+
+  &:hover .icon-btn,
+  &:focus-within .icon-btn {
+    opacity: 1;
+  }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: @text;
+    cursor: pointer;
   }
 
   &__text {
@@ -595,6 +625,7 @@ button {
 }
 
 .icon-btn {
+  transition: opacity 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -610,6 +641,11 @@ button {
   &:hover {
     background: @line;
     color: @text;
+  }
+
+  &--danger:hover {
+    background: fade(@danger, 18%);
+    color: @danger;
   }
 }
 

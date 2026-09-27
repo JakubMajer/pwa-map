@@ -279,8 +279,6 @@ export default function App() {
         flyTarget={flyTarget}
         selectedId={selectedId}
         onSelect={setSelectedId}
-        onEdit={editPlace}
-        onDelete={askDeletePlace}
       />
 
       <Sidebar
@@ -305,6 +303,7 @@ export default function App() {
         onDeleteCategory={askDeleteCategory}
         onAddPlace={startNewPlace}
         onEditPlace={editPlace}
+        onDeletePlace={askDeletePlace}
         onExport={exportData}
         onImport={importData}
       />

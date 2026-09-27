@@ -1,6 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 import * as format from '../format.js'
 
+// Úpravy a mazání bodu patří do menu – v bublině na mapě zůstává jen navigace.
+function PlaceActions({ place, onEdit, onDelete }) {
+  return (
+    <>
+      <button
+        type="button"
+        className="icon-btn"
+        onClick={() => onEdit(place)}
+        aria-label={`Upravit bod ${place.name}`}
+        title="Upravit"
+      >
+        ✎
+      </button>
+      <button
+        type="button"
+        className="icon-btn icon-btn--danger"
+        onClick={() => onDelete(place)}
+        aria-label={`Smazat bod ${place.name}`}
+        title="Smazat"
+      >
+        🗑
+      </button>
+    </>
+  )
+}
+
 export default function Sidebar({
   categories,
   placesByCategory,
@@ -19,6 +45,7 @@ export default function Sidebar({
   onDeleteCategory,
   onAddPlace,
   onEditPlace,
+  onDeletePlace,
   onExport,
   onImport,
 }) {
@@ -68,18 +95,20 @@ export default function Sidebar({
               <h2 className="results__title">Moje body</h2>
               {matches.length === 0 && <p className="muted">Nic nenalezeno.</p>}
               {matches.map(({ place, category }) => (
-                <button
-                  key={place.id}
-                  type="button"
-                  className="row row--place"
-                  onClick={() => onSelectPlace(place.id)}
-                >
-                  <span className="dot" style={{ background: category?.color || '#6b7280' }} />
-                  <span className="row__text">
-                    <strong>{place.name}</strong>
-                    <small>{category ? `${category.icon} ${category.name}` : 'Bez kategorie'}</small>
-                  </span>
-                </button>
+                <div className="row" key={place.id}>
+                  <button
+                    type="button"
+                    className="row__main"
+                    onClick={() => onSelectPlace(place.id)}
+                  >
+                    <span className="dot" style={{ background: category?.color || '#6b7280' }} />
+                    <span className="row__text">
+                      <strong>{place.name}</strong>
+                      <small>{category ? `${category.icon} ${category.name}` : 'Bez kategorie'}</small>
+                    </span>
+                  </button>
+                  <PlaceActions place={place} onEdit={onEditPlace} onDelete={onDeletePlace} />
+                </div>
               ))}
 
               <h2 className="results__title">
@@ -94,18 +123,15 @@ export default function Sidebar({
                 <p className="muted">Žádné místo nenalezeno.</p>
               )}
               {geoResults.map((result) => (
-                <button
-                  key={result.id}
-                  type="button"
-                  className="row row--geo"
-                  onClick={() => onGeoPick(result)}
-                >
-                  <span className="dot dot--geo">📍</span>
-                  <span className="row__text">
-                    <strong>{result.label.split(',')[0]}</strong>
-                    <small>{result.label}</small>
-                  </span>
-                </button>
+                <div className="row" key={result.id}>
+                  <button type="button" className="row__main" onClick={() => onGeoPick(result)}>
+                    <span className="dot dot--geo">📍</span>
+                    <span className="row__text">
+                      <strong>{result.label.split(',')[0]}</strong>
+                      <small>{result.label}</small>
+                    </span>
+                  </button>
+                </div>
               ))}
             </section>
           ) : (
@@ -160,34 +186,19 @@ export default function Sidebar({
                           </button>
                         </div>
                         {places.map((place) => (
-                          <button
-                            key={place.id}
-                            type="button"
-                            className="row row--place"
-                            onClick={() => onSelectPlace(place.id)}
-                          >
-                            <span className="row__text">
-                              <strong>{place.name}</strong>
-                              {place.description && <small>{place.description}</small>}
-                            </span>
-                            <span
-                              className="icon-btn"
-                              role="button"
-                              tabIndex={0}
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                onEditPlace(place)
-                              }}
-                              onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
-                                  event.stopPropagation()
-                                  onEditPlace(place)
-                                }
-                              }}
+                          <div className="row" key={place.id}>
+                            <button
+                              type="button"
+                              className="row__main"
+                              onClick={() => onSelectPlace(place.id)}
                             >
-                              ✎
-                            </span>
-                          </button>
+                              <span className="row__text">
+                                <strong>{place.name}</strong>
+                                {place.description && <small>{place.description}</small>}
+                              </span>
+                            </button>
+                            <PlaceActions place={place} onEdit={onEditPlace} onDelete={onDeletePlace} />
+                          </div>
                         ))}
                         {places.length === 0 && <p className="muted">Zatím žádné body.</p>}
                       </div>

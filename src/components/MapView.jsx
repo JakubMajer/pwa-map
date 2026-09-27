@@ -2,6 +2,17 @@ import { useEffect, useMemo, useRef } from 'react'
 import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { navigationUrl } from '../navigation.js'
+
+// Podklad: OpenStreetMap, odbarvený CSS filtrem (viz .leaflet-tile v app.less).
+// Hotové šedé sady (CARTO Positron, Stamen Toner, Stadia) dnes všechny vyžadují
+// API klíč, OSM je bez registrace a dá plný zoom 19.
+const TILES = {
+  url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  subdomains: 'abc',
+  maxZoom: 19,
+}
 
 const DEFAULT_CENTER = [49.8175, 15.473] // střed ČR, mapa je ale celosvětová
 const DEFAULT_ZOOM = 7
@@ -80,8 +91,6 @@ export default function MapView({
   flyTarget,
   selectedId,
   onSelect,
-  onEdit,
-  onDelete,
 }) {
   const markerRefs = useRef({})
 
@@ -109,20 +118,20 @@ export default function MapView({
                   </span>
                 )}
                 {place.description && <p className="popup__text">{place.description}</p>}
-                <div className="popup__actions">
-                  <button type="button" onClick={() => onEdit(place)}>
-                    Upravit
-                  </button>
-                  <button type="button" className="danger" onClick={() => onDelete(place)}>
-                    Smazat
-                  </button>
-                </div>
+                <a
+                  className="popup__navigate"
+                  href={navigationUrl(place)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Navigovat
+                </a>
               </div>
             </Popup>
           </Marker>
         )
       }),
-    [places, categoriesById, selectedId, onSelect, onEdit, onDelete],
+    [places, categoriesById, selectedId, onSelect],
   )
 
   return (
@@ -135,9 +144,10 @@ export default function MapView({
       zoomControl={false}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
+        attribution={TILES.attribution}
+        url={TILES.url}
+        subdomains={TILES.subdomains}
+        maxZoom={TILES.maxZoom}
       />
       <MapClicks enabled={picking} onPick={onPick} />
       <FlyTo target={flyTarget} />
