@@ -41,7 +41,7 @@ export default function Sidebar({
         onClick={() => setOpen((value) => !value)}
         aria-label={open ? 'Skrýt menu' : 'Zobrazit menu'}
       >
-        {open ? '✕' : '☰'}
+        <span className="menu-toggle__bars" aria-hidden="true" />
       </button>
 
       <aside className={`sidebar${open ? '' : ' sidebar--closed'}`}>
