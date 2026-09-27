@@ -23,6 +23,12 @@ npm run preview      # náhled buildu (tady se teprve aktivuje service worker)
 
 Přes Docker: `docker compose up`
 
+Ikony PWA (oranžový pin) se generují skriptem, ne ručně v grafice:
+`npm run icons` – přepíše `public/icon-192.png` a `public/icon-512.png`
+podle `tools/make-icon.mjs` (barvy a tvar jsou nahoře v souboru).
+Po změně ikon zvyš `SHELL_CACHE` v `public/service-worker.js`, jinak
+si nainstalovaná appka podrží tu starou z cache.
+
 ## Struktura
 
 ```

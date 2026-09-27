@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "icons": "node tools/make-icon.mjs 192:public/icon-192.png 512:public/icon-512.png"
   },
   "dependencies": {
     "idb": "^8.0.3",
@@ -20,5 +21,5 @@
     "less": "^4.2.0",
     "vite": "^6.0.0"
   },
-  "description": "PWA mapa s vlastními kategoriemi a body"
+  "description": "PWA mapa s vlastn\u00edmi kategoriemi a body"
 }

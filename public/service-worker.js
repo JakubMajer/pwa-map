@@ -1,7 +1,8 @@
-const VERSION = 'v1'
-const SHELL_CACHE = `mapa-shell-${VERSION}`
-const ASSET_CACHE = `mapa-assets-${VERSION}`
-const TILE_CACHE = `mapa-tiles-${VERSION}`
+// Shell se verzuje zvlášť – při výměně ikon nebo index.html zvyš jen jeho
+// číslo, ať uživatel nepřijde o stažené dlaždice mapy.
+const SHELL_CACHE = 'mapa-shell-v2'
+const ASSET_CACHE = 'mapa-assets-v2'
+const TILE_CACHE = 'mapa-tiles-v1'
 const TILE_LIMIT = 600
 
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png']
@@ -31,6 +32,20 @@ async function trimCache(name, limit) {
   const keys = await cache.keys()
   if (keys.length <= limit) return
   await Promise.all(keys.slice(0, keys.length - limit).map((key) => cache.delete(key)))
+}
+
+// Soubory bez hashe v názvu (manifest, ikony) se musí umět obnovit – vrátíme
+// je z cache hned, ale na pozadí stáhneme novou verzi pro příští spuštění.
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName)
+  const cached = await cache.match(request)
+  const network = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone())
+      return response
+    })
+    .catch(() => cached)
+  return cached || network
 }
 
 async function cacheFirst(request, cacheName, limit) {
@@ -69,6 +84,11 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Statické soubory mají v názvu hash, takže cache-first je bezpečné.
-  event.respondWith(cacheFirst(request, ASSET_CACHE).catch(() => caches.match(request)))
+  // Build assety mají v názvu hash, ty se nikdy nemění pod rukama.
+  if (url.pathname.includes('/assets/')) {
+    event.respondWith(cacheFirst(request, ASSET_CACHE).catch(() => caches.match(request)))
+    return
+  }
+
+  event.respondWith(staleWhileRevalidate(request, SHELL_CACHE))
 })
