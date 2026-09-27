@@ -59,6 +59,13 @@ export default function Sidebar({
   }, [])
 
   const searching = query.trim().length > 0
+  const noCategories = categories.length === 0
+
+  // Umisťování bodu se dělá klikem do mapy, takže panel musí z cesty.
+  function startAddPlace() {
+    setOpen(false)
+    onAddPlace()
+  }
 
   return (
     <>
@@ -69,6 +76,17 @@ export default function Sidebar({
         aria-label={open ? 'Skrýt menu' : 'Zobrazit menu'}
       >
         <span className="menu-toggle__bars" aria-hidden="true" />
+      </button>
+
+      <button
+        type="button"
+        className="add-point"
+        onClick={startAddPlace}
+        disabled={noCategories}
+        aria-label="Přidat bod"
+        title={noCategories ? 'Nejdřív vytvoř kategorii' : 'Přidat bod'}
+      >
+        <span className="add-point__plus" aria-hidden="true" />
       </button>
 
       <aside className={`sidebar${open ? '' : ' sidebar--closed'}`}>
@@ -218,9 +236,9 @@ export default function Sidebar({
             <button
               type="button"
               className="primary"
-              onClick={onAddPlace}
-              disabled={categories.length === 0}
-              title={categories.length === 0 ? 'Nejdřív vytvoř kategorii' : undefined}
+              onClick={startAddPlace}
+              disabled={noCategories}
+              title={noCategories ? 'Nejdřív vytvoř kategorii' : undefined}
             >
               + Bod
             </button>
